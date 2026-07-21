@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Айа · помощник коменданта</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+            background: #f2f7fc;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .chat-wrapper {
+            max-width: 820px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 32px;
+            box-shadow: 0 12px 40px rgba(0, 40, 80, 0.12);
+            overflow: hidden;
+            border: 1px solid #e2edf7;
+            transition: all 0.2s;
+        }
+
+        .chat-header {
+            background: #1a4b6d;
+            padding: 20px 24px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            border-bottom: 2px solid #d0e2f0;
+        }
+
+        .avatar {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 22px;
+            letter-spacing: 1px;
+            color: #d9ecff;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .header-text {
+            flex: 1;
+        }
+
+        .header-text h1 {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            line-height: 1.2;
+        }
+
+        .header-text .sub {
+            font-size: 14px;
+            opacity: 0.8;
+            font-weight: 300;
+            margin-top: 2px;
+        }
+
+        .badge {
+            background: #eef6fc;
+            color: #1a4b6d;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 40px;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 16px 20px 12px 20px;
+            background: #f8fbfe;
+            border-bottom: 1px solid #deecf5;
+        }
+
+        .quick-btn {
+            background: white;
+            border: 1px solid #c8ddee;
+            border-radius: 40px;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #1a4b6d;
+            cursor: pointer;
+            transition: 0.15s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+            letter-spacing: 0.2px;
+            background: #f3f9ff;
+        }
+
+        .quick-btn:hover {
+            background: #e5f0fa;
+            border-color: #7aa9cc;
+            box-shadow: 0 2px 6px rgba(26, 75, 109, 0.08);
+        }
+
+        .quick-btn:active {
+            background: #cde0ef;
+        }
+
+        .chat-messages {
+            padding: 18px 20px 12px 20px;
+            background: #ffffff;
+            max-height: 420px;
+            min-height: 260px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message {
+            max-width: 88%;
+            padding: 12px 18px;
+            border-radius: 20px;
+            line-height: 1.5;
+            font-size: 15px;
+            word-break: break-word;
+            background: #f0f6fd;
+            color: #1d2d3c;
+            align-self: flex-start;
+            border-bottom-left-radius: 6px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+
+        .message.user {
+            background: #1a4b6d;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 6px;
+            border-bottom-left-radius: 20px;
+        }
+
+        .message-system {
+            background: #e9f0f7;
+            border-left: 4px solid #6f9fc7;
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            color: #1e3b4f;
+            align-self: flex-start;
+            max-width: 92%;
+        }
+
+        .chat-input-area {
+            padding: 12px 20px 20px 20px;
+            background: #fafdff;
+            border-top: 1px solid #deecf5;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #c8ddee;
+            border-radius: 40px;
+            font-size: 15px;
+            outline: none;
+            background: white;
+            transition: 0.15s;
+            color: #1a2e3f;
+        }
+
+        .chat-input-area input:focus {
+            border-color: #1a4b6d;
+            box-shadow: 0 0 0 3px rgba(26, 75, 109, 0.08);
+        }
+
+        .chat-input-area input::placeholder {
+            color: #889fb3;
+            font-weight: 300;
+        }
+
+        .send-btn {
+            background: #1a4b6d;
+            border: none;
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.15s;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(26, 75, 109, 0.2);
+        }
+
+        .send-btn:hover {
+            background: #123b56;
+            transform: scale(1.02);
+        }
+
+        .send-btn:active {
+            background: #0d2f45;
+        }
+
+        .send-btn svg {
+            width: 22px;
+            height: 22px;
+            fill: white;
+        }
+
+        .footnote {
+            text-align: center;
+            font-size: 12px;
+            color: #6a8aa3;
+            padding: 10px 20px 16px 20px;
+            border-top: 1px solid #e3eef8;
+            background: #f9fcff;
+            letter-spacing: 0.2px;
+        }
+
+        .footnote span {
+            opacity: 0.7;
+        }
+
+        /* modal / presentation */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 20, 40, 0.55);
+            backdrop-filter: blur(3px);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 1000;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-card {
+            background: white;
+            max-width: 900px;
+            width: 100%;
+            max-height: 92vh;
+            border-radius: 32px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: slideUp 0.2s ease;
+        }
+
+        .modal-header {
+            background: #1a4b6d;
+            padding: 16px 24px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        .modal-close {
+            background: rgba(255,255,255,0.12);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 40px;
+            font-size: 26px;
+            cursor: pointer;
+            transition: 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .modal-body {
+            padding: 0;
+            overflow-y: auto;
+            background: #fafdff;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-body iframe {
+            width: 100%;
+            height: 70vh;
+            border: none;
+            flex: 1;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @media (max-width: 550px) {
+            .modal-body iframe {
+                height: 60vh;
+            }
+            .chat-wrapper { border-radius: 24px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-wrapper">
+        <div class="chat-header">
+            <div class="avatar">А</div>
+            <div class="header-text">
+                <h1>Айа</h1>
+                <div class="sub">цифровой помощник коменданта</div>
+            </div>
+            <div class="badge">Дом студентов №2</div>
+        </div>
+
+        <div class="quick-actions">
+            <button class="quick-btn" data-action="rules">📋 Правила проживания</button>
+            <button class="quick-btn" data-action="payment">💳 Реквизиты для оплаты</button>
+            <button class="quick-btn" data-action="contacts">📞 Контакты</button>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="message message-system">
+                Здравствуйте. Я Айа, помощник коменданта. Задайте вопрос о проживании в общежитии, и я постараюсь помочь. Если информации нет — направлю в администрацию.
+            </div>
+        </div>
+
+        <div class="chat-input-area">
+            <input type="text" id="userInput" placeholder="Введите ваш вопрос..." autocomplete="off">
+            <button class="send-btn" id="sendBtn" aria-label="Отправить">
+                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+        </div>
+
+        <div class="footnote">
+            <span>Для проверки задолженности введите своё полное имя и слово "долг".</span>
+        </div>
+    </div>
+
+    <!-- Modal: Правила проживания (PDF) -->
+    <div class="modal-overlay" id="rulesModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>Правила проживания в общежитии КГМУ</h2>
+                <button class="modal-close" id="modalCloseBtn">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Исправленная ссылка для встраивания PDF -->
+                <iframe src="https://drive.google.com/file/d/10cKZ0UhRjKBMtAOgu6hPncyaUZnlhK9i/preview" allow="autoplay"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Payment QR -->
+    <div class="modal-overlay" id="paymentModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>Оплата за общежитие через онлайн-банк</h2>
+                <button class="modal-close" id="paymentModalCloseBtn">&times;</button>
+            </div>
+            <div class="modal-body" id="paymentModalBody">
+                <div style="display: flex; flex-direction: column; align-items: center; margin: 16px 0 8px 0; background: white; padding: 16px; border-radius: 20px; border: 1px solid #deecf5;">
+                    <img src="https://kirovgma.ru/sites/default/files/inline/images/qr2.png" alt="QR-код для оплаты за общежитие" style="max-width: 280px; width: 100%; height: auto; border-radius: 12px; background: white;">
+                    <div style="margin-top: 12px; font-size: 14px; color: #1a3b4f; text-align: center;">Отсканируйте QR-код в мобильном приложении вашего банка для оплаты</div>
+                </div>
+                <p>Также вы можете оплатить проживание в кассе университета (3 учебный корпус, 2 этаж) или через кассу в любом банке, предварительно взяв квитанцию с реквизитами в бухгалтерии (3 учебный корпус, кабинет 131).</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ---------- БАЗА ДАННЫХ ЗАДОЛЖЕННОСТИ ----------
+            const debtMap = new Map();
+
+            const debtData = [
+                ["Аббан Эммануэль", "11 601,00"],
+                ["Абдалла Билал Башир Билал", "18 338,00"],
+                ["Абдалла Исмаил Манни Абдуллати", "12 579,00"],
+                ["Абдалла Хассан Мохагир Абделькрим", "11 194,00"],
+                ["Абделаал Мустафа Хафез Эссам Хуссейн", "9 203,00"],
+                ["Абделазиз Мараван Айман Мохамед", "8 133,00"],
+                ["Абделазиз Моамен Айман Мохамед", "5 518,00"],
+                ["Абделазиз Хуссейн Абдалла Абдалла", "1 508,00"],
+                ["Абделгадир Али Хассан Абделазиз", "15 591,00"],
+                ["Абделгадир Таха Осман Абделрахман", "3 653,00"],
+                ["Абделкадер Мохамед Гамал Эльдессоки", "0,00"],
+                ["Абделкарим Ахмед Элсайед Севери", "7 172,00"],
+                ["Абделрахман Мохамед Хамдан Мохамед", "0,00"],
+                ["Абдельгавад Махмуд Абдельтаваб Абдельалим", "6 214,00"],
+                ["Абдельгалил Алаа Абдельнаби Хуссейн", "6 541,00"],
+                ["Абдельгани Ахмед Бахааелдин Хешмат", "1 613,00"],
+                ["Абдельгани Магди Моатаз Ахмед", "10 620,00"],
+                ["Абдельхалек Абдельрахман Халед Файез", "6 078,00"],
+                ["Абдулазиз Хассан Али Галдагон", "1 508,00"],
+                ["Абдулла", "14 625,00"],
+                ["Абдулла Хаммад", "9 709,00"],
+                ["Абдулрахман Абдулрахман Абдуллах Фархан", "11 870,00"],
+                ["Абудиеф Еззелдин Амир Али", "5 844,00"],
+                ["Абуелезз Мохамед Мамдух Абуелезз Ибрахим", "8 822,00"],
+                ["Адениджи Олувасола Питер", "0,00"],
+                ["Азиз Бакр Амр Махмуд", "2 124,00"],
+                ["Азимов Шахзод Рустамович", "4 089,00"],
+                ["Азирар Абделгафур", "7 709,00"],
+                ["Азирар Абдессамад", "5 652,00"],
+                ["Аиса Хуссеин Абдалла Хуссеин", "2 783,00"],
+                ["Айад Ахмед Тарек Хассанин Заки", "15 572,00"],
+                ["Акул Хешам Абдельхамид Мохамед", "12 635,00"],
+                ["Ал-Наггар Аббас Наджи Абдуллах", "12 773,00"],
+                ["Ал-Наггар Абдуллах Салех Абдуллах Сайд", "7 273,00"],
+                ["Ал-Наггар Мустафа Мусаед Абдуллах Сайд", "6 953,00"],
+                ["Алали Алхасан Али", "850,00"],
+                ["Алдердери Мохамед Мохамед Борма", "11 947,00"],
+                ["Али Альсайед Абдальрхман Альсайед", "6 653,00"],
+                ["Али Ибрахим Эссам Ахмед", "1 839,00"],
+                ["Али Махмуд Мамун Мохамед", "11 051,00"],
+                ["Али Махмуд Мохамед Махмуд Мохамед", "13 016,00"],
+                ["Али Мохамед Ахмед Салех", "0,00"],
+                ["Али Мухаммад Асим", "2 688,00"],
+                ["Али Омар Моахмед Исмаил Махмуд", "0,00"],
+                ["Алибрахим Алтаха Ибрахим", "418,52"],
+                ["Алом МД Шамсул", "138,00"],
+                ["Аль Ахмад Амар", "4 194,00"],
+                ["Аль Гарби Мохаммад Нур", "3 466,00"],
+                ["Аль Хажж Али Хассан", "678,90"],
+                ["Аль Хурани Мхд Яман", "22 285,69"],
+                ["Аль-Авди Юсеф Мохаммед Каид", "10 209,00"],
+                ["Аль-Бухайши Ахмед Адел Ахмед", "4 372,00"],
+                ["Аль-Хурайми Хафез Абдулатив Ахмед", "7 220,00"],
+                ["Альамин Эльтайеб Мохамедали Эльтайеб", "1 373,00"],
+                ["Альхамим Абдулла Альбашир Мохамед", "16 774,00"],
+                ["Амер Мохамад Амджад Мохамад Эльсаиед", "4 774,00"],
+                ["Ангон Пратош Канти Рой", "1 566,00"],
+                ["Атая Эльхассан Эльсайед Авад Мохи", "19 362,00"],
+                ["Атва Мустафа Айман Рамадан", "8 149,00"],
+                ["Аттая Эльхуссейн Эльсайед Авад Мохи", "19 362,00"],
+                ["Ахмад Абделлах Кхиар Сайед", "3 575,00"],
+                ["Ахмад Лукман", "14 347,00"],
+                ["Ахмат Исмаил Тахир Сулейман", "2 698,00"],
+                ["Ахмед Абдулгабар Эльмигдад Атиф", "12 343,00"],
+                ["Ахмед Абдулгабар Эльмугтаба Атиф", "12 710,00"],
+                ["Ахмед Ахмед Мустафа Рагаб", "1 562,00"],
+                ["Ахмед Джубайер", "7 524,00"],
+                ["Ахмед Карим Едрис Али", "1 423,00"],
+                ["Ахмед МД Суаив", "1 546,00"],
+                ["Ахмед Мохамед Мустафа Амин Аттиа", "10 126,00"],
+                ["Ахмед Юссеф Омар Ахмед Ибрахим", "10 367,00"],
+                ["Ахмед Юссеф Рамадан Ибрахим", "4 718,00"],
+                ["Ба Мадхад Абдулрахман Халед Мубарак Ал-Нажжар", "6 483,00"],
+                ["Ба Нафеа Мохаммед Амин Мохаммед", "4 113,00"],
+                ["Ба Саиди Нассер Мухаммед Абдурабу Абдулла", "10 724,00"],
+                ["Багуа Мухемедхен", "5 652,00"],
+                ["Бадави Амр Сабри Абдельрауф", "0,00"],
+                ["Баруа Саикет", "9 739,00"],
+                ["Билал Хавалсул Абдалла Али", "15 153,00"],
+                ["Бобогулов Хусан Журамуротович", "16 103,00"],
+                ["Бхил Паван Кумар", "3 338,00"],
+                ["Вахаб Абдул (4 курс)", "5 347,00"],
+                ["Вахаб Абдул (5 курс)", "4 894,00"],
+                ["Гад Ахмед Мохамед Хемдан", "0,00"],
+                ["Ганем Ахмед Мохамед Мохамед Ахмед", "1 611,00"],
+                ["Гирев Антон Андреевич", "2 190,00"],
+                ["Гомаа Мохамед Солиман Амер", "7 881,00"],
+                ["Гоним Еслам Ахмед Абделаал", "3 369,00"],
+                ["Дас Эмон", "3 519,00"],
+                ["Даталл Джиби", "18 671,00"],
+                ["Дахруг Осама Магед Абдельхалек Абдельазиз", "5 016,53"],
+                ["Джамиль Мухаммад Ахмад Раза", "7 527,00"],
+                ["Джобран Марио Магед Моркос", "0,00"],
+                ["Джумаев Фузули Фахриддинович", "5 499,00"],
+                ["Диеаелдин Осман Бабикер Мохамед", "16 782,00"],
+                ["Ду Аят Аллах", "6 508,00"],
+                ["Елфахем Моухадхеб", "16 644,00"],
+                ["Заид Абдулазиз Абдо Аббас Салех", "11 909,00"],
+                ["Зине Абделкадер", "11 758,00"],
+                ["Ибрахим Абделрахман Хамди Нади Мохамед", "8 625,00"],
+                ["Ибрахим Айман Мохамед Элвани", "2 023,00"],
+                ["Ибрахим Ахмед Абделазиз Ибрахим", "12 697,00"],
+                ["Ибрахим Карим Эззат Ахмед Аттиа", "17 896,00"],
+                ["Ибрахим Мохамед Хуссейн Мохамед", "12 138,00"],
+                ["Ибрахим Мустафа Рамадан Аббас", "13 409,00"],
+                ["Идреес Мухаммад Талха", "4 700,00"],
+                ["Исах Эммануель Окехе", "2 500,00"],
+                ["Ислам МД Обайдул", "3 546,00"],
+                ["Исмаил Сахиль", "11 395,00"],
+                ["Йадав Шивам Сурендра", "5 005,00"],
+                ["Каид Мохаммед Фаисал Мохаммед", "7 953,00"],
+                ["Каиф Мохебулла Аль", "1 613,00"],
+                ["Камел Мохамед Али Сайед", "11 188,00"],
+                ["Котб Алаа Мохамед Хассан", "5 652,00"],
+                ["Кумар Дипак", "4 005,00"],
+                ["Кхушал Урф Хилона Рам", "5 639,00"],
+                ["Мазин Абдалла Альамин Сулиман", "15 625,00"],
+                ["Мазин Мохаммд Аламеен Сиддиг Мохаммд Аламеен", "1 373,00"],
+                ["Манаа Абдельвахаб Эльсаед Махмуд Ахмед", "3 519,00"],
+                ["Махмуд Юсейф Санхури Юсейф", "7 698,00"],
+                ["Менсах Даниэль", "9 629,00"],
+                ["Метвалли Ахмед Метвалли Ибрахим", "7 720,00"],
+                ["Монир Саад Мохамед Юсиф", "7 874,00"],
+                ["Мохамед Абделрахман Мохамед Ахмед", "0,00"],
+                ["Мохамед Ахмед Галал Абделсаттар Абумосалам", "8 213,00"],
+                ["Мохамед Ахмед Мохамед Абдульмуним", "11 407,00"],
+                ["Мохамед Ахмед Мустафа Али", "5 443,00"],
+                ["Мохамед Махмуд Галал Абделсаттар Абумосалам", "8 213,00"],
+                ["Мохамед Махмуд Салман Еид", "21 316,00"],
+                ["Мохамед Мосбах Мохамед Хаири", "1 577,00"],
+                ["Мохамед Омер Альтайеб Ахмед", "11 774,00"],
+                ["Мохамеди Валл Бей", "15 220,00"],
+                ["Мохамеднур Мохамед Айман Адам", "10 213,00"],
+                ["Мохаммед Абдулла Аббас Абдулла", "0,00"],
+                ["Мохильдин Акуд Мохамед Сайфельдин", "21 683,00"],
+                ["Мубарак Ахмед Мохаммед Фарах", "11 579,00"],
+                ["Мубарак Юссеф Мохамед Ради", "17 874,00"],
+                ["Мубашир Али", "0,00"],
+                ["Мунатсва Делайт Такудзва", "9 766,00"],
+                ["Муса Мохамед Ахмед Яссин", "0,00"],
+                ["Мутасим Ахмед Едрис Ахмед", "10 652,00"],
+                ["Мутвакл Ахмед Мохамед Ахмед", "11 643,00"],
+                ["Ники Минхар Миази", "7 698,00"],
+                ["Нихал Имтихан", "8 209,00"],
+                ["Нхондо Мартин Питер", "19 655,00"],
+                ["Олуфунми Даниель Айанфеолува", "3 620,00"],
+                ["Оме Деван Камруджаман", "3 964,00"],
+                ["Омер Башир Омер Яхья", "11 011,00"],
+                ["Осеи Деннис Сюзан Амоа", "10 973,00"],
+                ["Оуккал Юсеф", "14 372,00"],
+                ["Охене-Аду Юджин", "15 805,00"],
+                ["Партхо Мир Хасибул Хоссаин", "8 314,00"],
+                ["Поляков Даниил Павлович", "1 397,00"],
+                ["Раджбангши Мирнал", "1 557,00"],
+                ["Ради Мохамед Сабир Мохамед", "10 074,00"],
+                ["Рамади Найф Яссер Зейд Хассан", "1 613,00"],
+                ["Рами Есамелдеин Муса Хамид", "5 633,00"],
+                ["Ратим Сиум Хасан", "3 519,00"],
+                ["Рахман МД Наймур", "3 451,00"],
+                ["Рашуан Иад Фараг Али", "0,00"],
+                ["Рияд МД Шарифул Алам", "8 794,00"],
+                ["Рохан МД Сакиб Хоссейн", "2 066,00"],
+                ["Саад Махмуд Шехата Ибрахим Абдельмонейм", "19 527,00"],
+                ["Саад Мостафа Шехата Ибрахим Абдельмонейм", "10 527,00"],
+                ["Сайед Мохамед Габер Шехата", "17 331,00"],
+                ["Салам Абдус", "16 597,00"],
+                ["Салама Ахмед Ахмед Мохамед Мохамед", "14 209,00"],
+                ["Санаулла", "9 088,00"],
+                ["Селим Мохамед Элараби Махмуд", "15 625,00"],
+                ["Сиам Шихаб Уддин", "10 578,00"],
+                ["Солиман Махмуд Гамал Нассар Мохамед", "18 389,00"],
+                ["Сохаг МД Элиас Канчон", "1 546,00"],
+                ["Староверов Даниил Викторович", "5 600,00"],
+                ["Студенцов Олег Борисович", "970,00"],
+                ["Тавела Ахмед Али Абделхади Али", "16 474,00"],
+                ["Таха Мохамед Махер Ахмед Раби", "10 139,00"],
+                ["Тогмбаие Джимадум Жозуэ", "15 954,00"],
+                ["Тоуати Уссама", "1 662,00"],
+                ["Убайдуллоев Олимджон Толибджонович", "10 166,00"],
+                ["Уллах Амин", "3 855,00"],
+                ["Усман Башер Мохамед", "13 026,00"],
+                ["Фарес Махмуд Махер Сабер", "6 765,00"],
+                ["Фарук Мухаммад", "11 215,00"],
+                ["Фоуда Мохамед Али Елшербини", "0,00"],
+                ["Халед Мохамед Моустафа Антар", "1 613,00"],
+                ["Хан Адил", "11 252,00"],
+                ["Хан Мухаммад Узаир", "11 451,00"],
+                ["Хани Амер Алсиеад Мохамед", "1 579,00"],
+                ["Ханнан Али", "8 588,00"],
+                ["Хаснат МД Ариф", "3 519,00"],
+                ["Хассан МД Ракиб", "3 519,00"],
+                ["Хассан Юсиф Абделькарим Ахмед", "3 283,00"],
+                ["Хашим Шериф Мохаммед", "17 868,00"],
+                ["Хемед Мохамед", "9 454,00"],
+                ["Хоссаин МД Нахид", "14 419,00"],
+                ["Хоссейн МД Рабби", "3 505,00"],
+                ["Хоссен Танвир", "3 519,00"],
+                ["Хуссейн Ахмед Салем Мохаммед", "12 079,00"],
+                ["Чоудхури Зубаир Хассаин", "1 613,00"],
+                ["Шаабан Ахмед Атеф Ибрахим", "5 189,00"],
+                ["Шавер Махмуд Гамаль Абдельсалам Радван", "3 519,00"],
+                ["Шаемов Даниил Тарасович", "969,00"],
+                ["Шахош Муасуд Рана", "1 546,00"],
+                ["Шераз Хуссаин", "22 579,00"],
+                ["Шерфа Мохамед", "13 954,00"],
+                ["Шихаб МД", "4 794,00"],
+                ["Шовон Осман Гони", "4 776,00"],
+                ["Эдрисс Осман Ибрагим Муса", "4 749,00"],
+                ["Элдахрави Омар Хешам Мустафа", "0,00"],
+                ["Элкашеф Сайфелдин Эмад Элсаид Мохамед", "8 644,00"],
+                ["Элмесайри Ахмед Махер Фатхи", "9 633,00"],
+                ["Элсамман Мостафа Хассан Сабер", "13 174,00"],
+                ["Элсемари Тарек Фуад Абделсалам", "0,00"],
+                ["Элшлиби Абделрахман Гомаа Заки Али", "13 446,00"],
+                ["Эль Хадж Дах", "3 519,00"],
+                ["Эльбакри Мохамед Саад Саад Мохамед", "0,00"],
+                ["Эльдаматти Самир Бадран Али Ибрахим", "7 624,00"],
+                ["Элькот Мохамед Фуад Абдельазиз", "10 609,00"],
+                ["Эльмасры Хассан Махмуд Абделазиз Эльсаед", "0,00"],
+                ["Эльнени Абдалла Мустафа Елсайед", "0,00"],
+                ["Эльрашид Саад Мохаммед Файсал", "0"],
+                ["Эльтаж Альтайб Мохамед Мохамед", "1 774,00"],
+                ["Эльхадж-Мимуне Имад Еддин Анес", "3 180,28"],
+                ["Эльхалифа Бабикер Ахмед Бабикер", "3 519,00"],
+                ["Юсиф Абдалсамад Юсиф Ахмед", "18 948,00"],
+                ["Ясир Сидахмед Мохамед Мохамед", "16 166,00"]
+            ];
+
+            for (const [name, amount] of debtData) {
+                debtMap.set(name.toLowerCase().trim(), { name: name, amount: amount });
+            }
+
+            // ---------- FAQ (ответы) ----------
+            const answers = new Map();
+            const rawAnswers = [
+                "",
+                "Здравствуйте! Рады приветствовать вас в Доме студентов № 2 Кировского медицинского университета! Меня зовут Айа, я помощник коменданта. Чем могу вам помочь?",
+                "Оплатить проживание можно в кассе университета (3 корпус, 2 этаж), через банк по квитанции из бухгалтерии (каб. 131) или онлайн по QR-коду на сайте и доске объявлений.",
+                "Для того, чтобы узнать о сумме своей задолженности, вам необходимо написать своё полное имя и указать номер комнаты, в которой вы проживаете. После этого я отвечу на ваш вопрос.",
+                "Продуктовые супермаркеты находятся по адресам: улица Никитская, 150 и улица Володарского, 171. Вы можете воспользоваться сервисами: Яндекс-карты https://yandex.ru/maps/46/kirov/?ll=49.668019%2C58.603595&z=12 и 2ГИС https://2gis.ru/kirov",
+                "Магазины хозяйственных товаров находятся по адресам: улица Свободы,128 и улица Свободы, 130. Вы можете воспользоваться сервисами: Яндекс-карты https://yandex.ru/maps/46/kirov/?ll=49.668019%2C58.603595&z=12 и 2ГИС https://2gis.ru/kirov",
+                "Ближайшее отделение банка находится по адресу: улица Воровского, 37. Вы можете воспользоваться сервисами: Яндекс-карты https://yandex.ru/maps/46/kirov/?ll=49.668019%2C58.603595&z=12 и 2ГИС https://2gis.ru/kirov",
+                "Аптека находится по адресу: улица Красноармейская, 44. Вы можете воспользоваться сервисами: Яндекс-карты https://yandex.ru/maps/46/kirov/?ll=49.668019%2C58.603595&z=12 и 2ГИС https://2gis.ru/kirov",
+                "Если вы заболели, вы можете обратиться в любое медицинское учреждение, указанное в вашем полисе ДМС. Если полиса нет — доступна только экстренная помощь. Вызовите 112. Также платные центры.",
+                "Приобрести полис ДМС можно в любой страховой компании в Кирове. Консультация в международном отделе: 3 корпус, каб. 105.",
+                "Потеря пропуска: обратитесь в бюро пропусков (3 корпус, справа от входа). Пн–Пт 8:30–16:30.",
+                "Потеря ключа: обратитесь к охране с документом, выдадут ключ на 1–2 часа для заказа дубликата.",
+                "Правила проживания размещены на доске объявлений и на сайте https://kirovgma.ru/studencheskie-obshchezhitiya",
+                "Переезд в другую комнату — по уважительным причинам, не чаще раза в год, по решению коменданта.",
+                "Переезд в другое общежитие — по решению жилищно-бытовой комиссии. Заявление на сайте.",
+                "Можно проживать в арендованном жилье при наличии временной регистрации. Подробности в международном отделе (каб. 105).",
+                "Часы тишины: с 22:00 до 7:00 (законодательство РФ).",
+                "Пропускной режим действует во всех корпусах. По пропуску проходят только студенты и сотрудники.",
+                "Гостевые посещения в общежитии запрещены распоряжением ректора. Встречайтесь на нейтральной территории.",
+                "Правила пожарной безопасности — на доске объявлений 1 этажа.",
+                "Курение запрещено в зданиях. Специальные места напротив общежития.",
+                "Правила пользования электроплитой — в офисе администрации (каб. 105, 106).",
+                "При сигнале пожарной тревоги: быстро одеться, взять документы, выключить приборы, эвакуироваться по плану.",
+                "Прачечная: 1 этаж, комн. 102, 24/7. Инструкция на стене.",
+                "Замена постельного белья: комн. 104, вторник 12:30–16:30, среда 12:30–16:00.",
+                "Открыть дебетовую карту можно в любом банке. Консультация в международном отделе (каб. 105).",
+                "Иностранные студенты могут официально трудоустроиться. Справка в международном отделе (каб. 105).",
+                "Миграционные правила — в международном отделе (каб. 105).",
+                "Камера хранения: обратитесь к коменданту (каб. 3 106). Пн–Пт 8:30–17:00.",
+                "Санитарные правила — часть общих правил. Доска объявлений, каб. 105, 106.",
+                "Уборка в комнатах производится студентами ежедневно по расписанию.",
+                "Мусор выбрасывать в контейнеры во дворе общежития.",
+                "Инвентарь и моющие средства — в магазинах хозтоваров (ул. Свободы, 128, 130).",
+                "Домашние животные запрещены правилами проживания.",
+                "Можно приобретать электронику (телефоны, ноутбуки, компьютеры, акустику).",
+                "Бытовую технику (холодильники, микроволновки и др.) можно, но с разрешения коменданта.",
+                "Проводной интернет — согласуйте с соседями и заключите договор с провайдером."
+            ];
+            for (let i = 1; i < rawAnswers.length; i++) answers.set(i, rawAnswers[i]);
+
+            // ---------- DOM ----------
+            const messagesContainer = document.getElementById('chatMessages');
+            const userInput = document.getElementById('userInput');
+            const sendBtn = document.getElementById('sendBtn');
+            const rulesModal = document.getElementById('rulesModal');
+            const rulesModalClose = document.getElementById('modalCloseBtn');
+            const paymentModal = document.getElementById('paymentModal');
+            const paymentModalClose = document.getElementById('paymentModalCloseBtn');
+
+            function addMessage(text, isUser = false) {
+                const div = document.createElement('div');
+                div.className = `message ${isUser ? 'user' : ''}`;
+                div.textContent = text;
+                messagesContainer.appendChild(div);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            function addSystemMessage(text) {
+                const div = document.createElement('div');
+                div.className = 'message-system';
+                div.textContent = text;
+                messagesContainer.appendChild(div);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            function findDebt(input) {
+                const lower = input.toLowerCase().trim();
+                if (!lower.includes('долг')) return null;
+
+                let namePart = lower.replace('долг', '').trim();
+                if (namePart.length === 0) return null;
+
+                for (const [key, value] of debtMap) {
+                    if (key.includes(namePart) || namePart.includes(key)) {
+                        return value;
+                    }
+                }
+
+                const words = namePart.split(/\s+/).filter(w => w.length > 1);
+                for (const [key, value] of debtMap) {
+                    const keyWords = key.split(/\s+/);
+                    let matchCount = 0;
+                    for (const w of words) {
+                        for (const kw of keyWords) {
+                            if (kw.includes(w) || w.includes(kw)) {
+                                matchCount++;
+                                break;
+                            }
+                        }
+                    }
+                    if (matchCount >= Math.min(words.length, 2)) {
+                        return value;
+                    }
+                }
+
+                return null;
+            }
+
+            function findAnswerByNumber(input) {
+                const trimmed = input.trim();
+                const match = trimmed.match(/^\s*(\d+)\s*$/);
+                if (match) {
+                    const num = parseInt(match[1], 10);
+                    if (answers.has(num)) return answers.get(num);
+                }
+                return null;
+            }
+
+            function findAnswerByKeywords(input) {
+                const lower = input.toLowerCase();
+                const questionMap = new Map([
+                    ['привет', 1], ['здравствуй', 1], ['добрый день', 1],
+                    ['оплатить проживание', 2], ['оплата', 2], ['как оплатить', 2],
+                    ['задолженность', 3], ['долг', 3],
+                    ['супермаркет', 4], ['продуктовый', 4],
+                    ['хозяйственный', 5], ['хозтовары', 5],
+                    ['банк', 6], ['отделение банка', 6],
+                    ['аптека', 7],
+                    ['заболел', 8], ['болезнь', 8], ['врач', 8],
+                    ['страховой полис', 9], ['дмс', 9],
+                    ['потерял пропуск', 10], ['пропуск', 10],
+                    ['потерял ключ', 11], ['ключ', 11],
+                    ['правила проживания', 12], ['правила', 12],
+                    ['переехать в другую комнату', 13], ['переезд комнаты', 13],
+                    ['переехать в другое общежитие', 14], ['сменить общежитие', 14],
+                    ['арендованную квартиру', 15], ['снять квартиру', 15],
+                    ['час тишины', 16], ['тишина', 16],
+                    ['пропускной режим', 17],
+                    ['пригласить гостей', 18], ['гости', 18],
+                    ['пожарная безопасность', 19], ['пожар', 19],
+                    ['курить', 20], ['курение', 20],
+                    ['электрическая плита', 21], ['плита', 21],
+                    ['пожарная тревога', 22], ['сигнал', 22],
+                    ['постирать', 23], ['прачечная', 23], ['стирка', 23],
+                    ['постельное бельё', 24], ['бельё', 24],
+                    ['открыть карту', 25], ['дебетовая карта', 25],
+                    ['трудоустроиться', 26], ['работа', 26],
+                    ['миграционные правила', 27], ['миграция', 27],
+                    ['камера хранения', 28], ['сдать вещи', 28],
+                    ['санитарные правила', 29], ['санитария', 29],
+                    ['уборка', 30], ['убирать', 30],
+                    ['мусор', 31], ['выбрасывать', 31],
+                    ['моющие средства', 32], ['инвентарь', 32],
+                    ['животные', 33], ['домашние животные', 33], ['питомцы', 33],
+                    ['компьютер', 34], ['ноутбук', 34], ['телевизор', 34],
+                    ['холодильник', 35], ['микроволновая', 35], ['бытовая техника', 35],
+                    ['проводной интернет', 36], ['интернет', 36]
+                ]);
+                for (let [phrase, qNum] of questionMap) {
+                    if (lower.includes(phrase)) {
+                        if (qNum === 3 && !lower.includes('долг')) continue;
+                        return answers.get(qNum) || null;
+                    }
+                }
+                return null;
+            }
+
+            function getResponse(input) {
+                const trimmed = input.trim();
+                if (trimmed === '') return null;
+
+                const debtResult = findDebt(trimmed);
+                if (debtResult) {
+                    return `Студент: ${debtResult.name}. Сумма задолженности: ${debtResult.amount} руб.`;
+                }
+
+                if (trimmed.toLowerCase().includes('долг')) {
+                    return null;
+                }
+
+                let resp = findAnswerByNumber(trimmed);
+                if (resp) return resp;
+
+                resp = findAnswerByKeywords(trimmed);
+                if (resp) return resp;
+
+                return null;
+            }
+
+            function handleSend() {
+                const raw = userInput.value.trim();
+                if (raw === '') return;
+                addMessage(raw, true);
+                userInput.value = '';
+                userInput.focus();
+
+                const answer = getResponse(raw);
+                if (answer) {
+                    addMessage(answer);
+                } else {
+                    addSystemMessage('Этой информации у меня нет. Обратитесь в администрацию общежития.');
+                }
+            }
+
+            function closeRulesModal() { rulesModal.classList.remove('active'); }
+            function closePaymentModal() { paymentModal.classList.remove('active'); }
+
+            function handleQuickAction(action) {
+                switch (action) {
+                    case 'rules': {
+                        // Открываем модальное окно с PDF
+                        rulesModal.classList.add('active');
+                        break;
+                    }
+                    case 'payment': {
+                        paymentModal.classList.add('active');
+                        break;
+                    }
+                    case 'contacts': {
+                        addMessage('Контакты', true);
+                        addMessage('Администрация общежития: 1 этаж, кабинеты № 105, 106. Комендант — кабинет 3 106. Режим работы: пн–пт с 8:30 до 17:00.');
+                        break;
+                    }
+                    default: break;
+                }
+            }
+
+            rulesModalClose.addEventListener('click', closeRulesModal);
+            rulesModal.addEventListener('click', (e) => { if (e.target === rulesModal) closeRulesModal(); });
+            paymentModalClose.addEventListener('click', closePaymentModal);
+            paymentModal.addEventListener('click', (e) => { if (e.target === paymentModal) closePaymentModal(); });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeRulesModal();
+                    closePaymentModal();
+                }
+            });
+
+            sendBtn.addEventListener('click', handleSend);
+            userInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') { e.preventDefault(); handleSend(); }
+            });
+
+            document.querySelectorAll('.quick-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const action = e.currentTarget.dataset.action;
+                    if (action) handleQuickAction(action);
+                });
+            });
+
+            userInput.focus();
+            addSystemMessage('Для проверки задолженности введите своё полное имя и слово "долг".');
+        })();
+    </script>
+</body>
+</html>
