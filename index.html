@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head><script src="https://telegram.org"></script>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Айа · помощник коменданта</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        /* (ваши стили без изменений) */
         * {
             margin: 0;
             padding: 0;
@@ -240,7 +242,6 @@
             opacity: 0.7;
         }
 
-        /* modal / presentation */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -375,7 +376,6 @@
         </div>
     </div>
 
-    <!-- Modal: Правила проживания (PDF) -->
     <div class="modal-overlay" id="rulesModal">
         <div class="modal-card">
             <div class="modal-header">
@@ -383,13 +383,11 @@
                 <button class="modal-close" id="modalCloseBtn">&times;</button>
             </div>
             <div class="modal-body" id="modalBody">
-                <!-- Исправленная ссылка для встраивания PDF -->
                 <iframe src="https://drive.google.com/file/d/10cKZ0UhRjKBMtAOgu6hPncyaUZnlhK9i/preview" allow="autoplay"></iframe>
             </div>
         </div>
     </div>
 
-    <!-- Modal: Payment QR -->
     <div class="modal-overlay" id="paymentModal">
         <div class="modal-card">
             <div class="modal-header">
@@ -407,7 +405,11 @@
     </div>
 
     <script>
-        window.Telegram.WebApp.ready();
+        // Инициализация Telegram WebApp
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand(); // Разворачивает приложение на весь экран
+
         (function() {
             // ---------- БАЗА ДАННЫХ ЗАДОЛЖЕННОСТИ ----------
             const debtMap = new Map();
@@ -760,14 +762,14 @@
                 const lower = input.toLowerCase();
                 const questionMap = new Map([
                     ['привет', 1], ['здравствуй', 1], ['добрый день', 1],
-                    ['оплатить проживание', 2], ['оплата', 2], ['как оплатить', 2],['заплатить',2],
+                    ['оплатить проживание', 2], ['оплата', 2], ['как оплатить', 2], ['заплатить', 2],
                     ['задолженность', 3], ['долг', 3],
                     ['супермаркет', 4], ['продуктовый', 4],
                     ['хозяйственный', 5], ['хозтовары', 5],
                     ['банк', 6], ['отделение банка', 6],
                     ['аптека', 7],
                     ['заболел', 8], ['болезнь', 8], ['врач', 8],
-                    ['страховой полис', 9], ['дмс', 9],['страховка', 9]
+                    ['страховой полис', 9], ['дмс', 9], ['страховка', 9],
                     ['потерял пропуск', 10], ['пропуск', 10],
                     ['потерял ключ', 11], ['ключ', 11],
                     ['правила проживания', 12], ['правила', 12],
@@ -848,7 +850,6 @@
             function handleQuickAction(action) {
                 switch (action) {
                     case 'rules': {
-                        // Открываем модальное окно с PDF
                         rulesModal.classList.add('active');
                         break;
                     }
